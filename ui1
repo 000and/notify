@@ -26,7 +26,7 @@ function UILibrary:NewWindow(windowTitle)
     -- Frame da janela principal (pequena e no canto superior)
     mainFrame.Name = "MainFrame"
     mainFrame.Parent = screenGui
-    mainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25) -- Janela mais escura
     mainFrame.Size = UDim2.new(0, 200, 0, 40) -- Pequeno
     mainFrame.Position = UDim2.new(0, 10, 0, 10) -- Canto superior esquerdo
     mainFrame.Active = true
@@ -51,12 +51,12 @@ function UILibrary:NewWindow(windowTitle)
     titleLabel.TextSize = 18
     titleLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-    -- Botão para abrir e fechar a janela
+    -- Botão para abrir e fechar a janela ("^" ao lado direito)
     toggleButton.Name = "ToggleButton"
     toggleButton.Parent = mainFrame
-    toggleButton.Text = "+"
+    toggleButton.Text = "˄"
     toggleButton.Size = UDim2.new(0, 30, 0, 30)
-    toggleButton.Position = UDim2.new(1, -65, 0, 5)
+    toggleButton.Position = UDim2.new(1, -35, 0, 5)
     toggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     toggleButton.Font = Enum.Font.SourceSansBold
@@ -71,7 +71,7 @@ function UILibrary:NewWindow(windowTitle)
     closeButton.Parent = mainFrame
     closeButton.Text = "X"
     closeButton.Size = UDim2.new(0, 30, 0, 30)
-    closeButton.Position = UDim2.new(1, -35, 0, 5)
+    closeButton.Position = UDim2.new(1, -65, 0, 5)
     closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
     closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     closeButton.Font = Enum.Font.SourceSansBold
@@ -90,10 +90,10 @@ function UILibrary:NewWindow(windowTitle)
     toggleButton.MouseButton1Click:Connect(function()
         if isOpen then
             mainFrame:TweenSize(UDim2.new(0, 200, 0, 40), "Out", "Quad", 0.3, true) -- Fecha a janela
-            toggleButton.Text = "+"
+            toggleButton.Text = "˄"
         else
             mainFrame:TweenSize(UDim2.new(0, 200, 0, 200), "Out", "Quad", 0.3, true) -- Abre a janela
-            toggleButton.Text = "-"
+            toggleButton.Text = "˅"
         end
         isOpen = not isOpen
     end)
@@ -117,6 +117,7 @@ function UILibrary:NewWindow(windowTitle)
         sectionFrame.Parent = mainFrame
         sectionFrame.Size = UDim2.new(1, 0, 0, 40)
         sectionFrame.BackgroundTransparency = 1
+        sectionFrame.Visible = isOpen -- Apenas visível quando a janela está aberta
 
         -- Label do título da seção
         sectionLabel.Parent = sectionFrame
@@ -183,12 +184,10 @@ function UILibrary:NewWindow(windowTitle)
             buttonCorner.CornerRadius = UDim.new(0, 10)
             buttonCorner.Parent = button
 
-            button.MouseButton1Click:Connect(function()
-                callback()
-            end)
+            button.MouseButton1Click:Connect(callback)
         end
 
-        -- Função para criar toggles (botões de alternância)
+        -- Função para criar toggles
         function section:CreateToggle(toggleText, callback)
             local toggle = Instance.new("TextButton")
             local toggleCorner = Instance.new("UICorner")
