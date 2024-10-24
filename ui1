@@ -1,11 +1,11 @@
-
 local UILibrary = {}
 
--- Função para criar a janela principal
+-- Função para criar a janela principal (pequena e no canto superior)
 function UILibrary:NewWindow(windowTitle)
     local screenGui = Instance.new("ScreenGui")
     local mainFrame = Instance.new("Frame")
     local titleLabel = Instance.new("TextLabel")
+    local toggleButton = Instance.new("TextButton")
     local uiCorner = Instance.new("UICorner")
     local uiListLayout = Instance.new("UIListLayout")
 
@@ -14,13 +14,12 @@ function UILibrary:NewWindow(windowTitle)
     screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
     screenGui.ResetOnSpawn = false
 
-    -- Frame da janela principal
+    -- Frame da janela principal (pequena e no canto superior)
     mainFrame.Name = "MainFrame"
     mainFrame.Parent = screenGui
     mainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-    mainFrame.Size = UDim2.new(0, 300, 0, 400)
-    mainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
-    mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    mainFrame.Size = UDim2.new(0, 200, 0, 40) -- Pequeno
+    mainFrame.Position = UDim2.new(0, 10, 0, 10) -- Canto superior esquerdo
     mainFrame.Active = true
     mainFrame.Draggable = true
 
@@ -33,23 +32,53 @@ function UILibrary:NewWindow(windowTitle)
     titleLabel.Name = "TitleLabel"
     titleLabel.Parent = mainFrame
     titleLabel.Text = windowTitle
-    titleLabel.Size = UDim2.new(1, 0, 0, 30)
+    titleLabel.Size = UDim2.new(1, -30, 0, 40)
     titleLabel.BackgroundTransparency = 1
     titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     titleLabel.Font = Enum.Font.SourceSansBold
-    titleLabel.TextSize = 20
-    titleLabel.TextXAlignment = Enum.TextXAlignment.Center
+    titleLabel.TextSize = 18
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+    -- Botão para abrir e fechar a janela
+    toggleButton.Name = "ToggleButton"
+    toggleButton.Parent = mainFrame
+    toggleButton.Text = "+"
+    toggleButton.Size = UDim2.new(0, 30, 0, 30)
+    toggleButton.Position = UDim2.new(1, -35, 0, 5)
+    toggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    toggleButton.Font = Enum.Font.SourceSansBold
+    toggleButton.TextSize = 18
+
+    local toggleButtonCorner = Instance.new("UICorner")
+    toggleButtonCorner.CornerRadius = UDim.new(1, 0)
+    toggleButtonCorner.Parent = toggleButton
 
     -- Bordas arredondadas
     uiCorner.CornerRadius = UDim.new(0, 10)
     uiCorner.Parent = mainFrame
+
+    -- Função para abrir e fechar a janela
+    local isOpen = false
+    toggleButton.MouseButton1Click:Connect(function()
+        if isOpen then
+            mainFrame:TweenSize(UDim2.new(0, 200, 0, 40), "Out", "Quad", 0.3, true) -- Fecha a janela
+            toggleButton.Text = "+"
+        else
+            mainFrame:TweenSize(UDim2.new(0, 200, 0, 200), "Out", "Quad", 0.3, true) -- Abre a janela
+            toggleButton.Text = "-"
+        end
+        isOpen = not isOpen
+    end)
 
     -- Função para criar seções na janela
     local window = {}
     function window:NewSection(sectionTitle)
         local sectionFrame = Instance.new("Frame")
         local sectionLabel = Instance.new("TextLabel")
-        local sectionListLayout = Instance.new("UIListLayout")
+        local sectionToggle = Instance.new("TextButton")
+        local contentFrame = Instance.new("Frame")
+        local uiListLayout = Instance.new("UIListLayout")
 
         -- Frame da seção
         sectionFrame.Parent = mainFrame
@@ -59,17 +88,47 @@ function UILibrary:NewWindow(windowTitle)
         -- Label do título da seção
         sectionLabel.Parent = sectionFrame
         sectionLabel.Text = sectionTitle
-        sectionLabel.Size = UDim2.new(1, 0, 0, 40)
+        sectionLabel.Size = UDim2.new(1, -30, 0, 40)
         sectionLabel.BackgroundTransparency = 1
         sectionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
         sectionLabel.Font = Enum.Font.SourceSansBold
         sectionLabel.TextSize = 18
         sectionLabel.TextXAlignment = Enum.TextXAlignment.Left
 
-        -- Layout para organizar os itens dentro da seção
-        sectionListLayout.Parent = sectionFrame
-        sectionListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        sectionListLayout.Padding = UDim.new(0, 5)
+        -- Botão para abrir e fechar a seção
+        sectionToggle.Parent = sectionFrame
+        sectionToggle.Text = "+"
+        sectionToggle.Size = UDim2.new(0, 30, 0, 30)
+        sectionToggle.Position = UDim2.new(1, -35, 0, 5)
+        sectionToggle.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        sectionToggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+        sectionToggle.Font = Enum.Font.SourceSansBold
+        sectionToggle.TextSize = 18
+
+        -- Frame de conteúdo da seção (escondido por padrão)
+        contentFrame.Parent = sectionFrame
+        contentFrame.Size = UDim2.new(1, 0, 0, 0)
+        contentFrame.Position = UDim2.new(0, 0, 1, 0)
+        contentFrame.BackgroundTransparency = 1
+        contentFrame.ClipsDescendants = true
+
+        -- Layout para organizar o conteúdo dentro da seção
+        uiListLayout.Parent = contentFrame
+        uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        uiListLayout.Padding = UDim.new(0, 5)
+
+        -- Função para abrir e fechar a seção
+        local sectionOpen = false
+        sectionToggle.MouseButton1Click:Connect(function()
+            if sectionOpen then
+                contentFrame:TweenSize(UDim2.new(1, 0, 0, 0), "Out", "Quad", 0.3, true) -- Fecha a seção
+                sectionToggle.Text = "+"
+            else
+                contentFrame:TweenSize(UDim2.new(1, 0, 0, 100), "Out", "Quad", 0.3, true) -- Abre a seção
+                sectionToggle.Text = "-"
+            end
+            sectionOpen = not sectionOpen
+        end)
 
         -- Funções para criar elementos dentro da seção
         local section = {}
@@ -79,7 +138,7 @@ function UILibrary:NewWindow(windowTitle)
             local button = Instance.new("TextButton")
             local buttonCorner = Instance.new("UICorner")
 
-            button.Parent = sectionFrame
+            button.Parent = contentFrame
             button.Text = buttonText
             button.Size = UDim2.new(1, -10, 0, 40)
             button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
@@ -102,7 +161,7 @@ function UILibrary:NewWindow(windowTitle)
             local toggleCorner = Instance.new("UICorner")
             local isToggled = false
 
-            toggle.Parent = sectionFrame
+            toggle.Parent = contentFrame
             toggle.Text = toggleText
             toggle.Size = UDim2.new(1, -10, 0, 40)
             toggle.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
