@@ -1,11 +1,20 @@
 local UILibrary = {}
 
+-- Variável global para rastrear a janela atual
+local currentWindow = nil
+
 -- Função para criar a janela principal (pequena e no canto superior)
 function UILibrary:NewWindow(windowTitle)
+    -- Se já existir uma janela aberta, deletar
+    if currentWindow then
+        currentWindow:Destroy()
+    end
+
     local screenGui = Instance.new("ScreenGui")
     local mainFrame = Instance.new("Frame")
     local titleLabel = Instance.new("TextLabel")
     local toggleButton = Instance.new("TextButton")
+    local closeButton = Instance.new("TextButton")
     local uiCorner = Instance.new("UICorner")
     local uiListLayout = Instance.new("UIListLayout")
 
@@ -23,6 +32,9 @@ function UILibrary:NewWindow(windowTitle)
     mainFrame.Active = true
     mainFrame.Draggable = true
 
+    -- Guardando a janela como a atual aberta
+    currentWindow = screenGui
+
     -- Layout para organizar as seções verticalmente
     uiListLayout.Parent = mainFrame
     uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
@@ -32,7 +44,7 @@ function UILibrary:NewWindow(windowTitle)
     titleLabel.Name = "TitleLabel"
     titleLabel.Parent = mainFrame
     titleLabel.Text = windowTitle
-    titleLabel.Size = UDim2.new(1, -30, 0, 40)
+    titleLabel.Size = UDim2.new(1, -60, 0, 40)
     titleLabel.BackgroundTransparency = 1
     titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     titleLabel.Font = Enum.Font.SourceSansBold
@@ -44,7 +56,7 @@ function UILibrary:NewWindow(windowTitle)
     toggleButton.Parent = mainFrame
     toggleButton.Text = "+"
     toggleButton.Size = UDim2.new(0, 30, 0, 30)
-    toggleButton.Position = UDim2.new(1, -35, 0, 5)
+    toggleButton.Position = UDim2.new(1, -65, 0, 5)
     toggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
     toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
     toggleButton.Font = Enum.Font.SourceSansBold
@@ -53,6 +65,21 @@ function UILibrary:NewWindow(windowTitle)
     local toggleButtonCorner = Instance.new("UICorner")
     toggleButtonCorner.CornerRadius = UDim.new(1, 0)
     toggleButtonCorner.Parent = toggleButton
+
+    -- Botão para fechar a janela (botão X)
+    closeButton.Name = "CloseButton"
+    closeButton.Parent = mainFrame
+    closeButton.Text = "X"
+    closeButton.Size = UDim2.new(0, 30, 0, 30)
+    closeButton.Position = UDim2.new(1, -35, 0, 5)
+    closeButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closeButton.Font = Enum.Font.SourceSansBold
+    closeButton.TextSize = 18
+
+    local closeButtonCorner = Instance.new("UICorner")
+    closeButtonCorner.CornerRadius = UDim.new(1, 0)
+    closeButtonCorner.Parent = closeButton
 
     -- Bordas arredondadas
     uiCorner.CornerRadius = UDim.new(0, 10)
@@ -69,6 +96,12 @@ function UILibrary:NewWindow(windowTitle)
             toggleButton.Text = "-"
         end
         isOpen = not isOpen
+    end)
+
+    -- Função para fechar a janela (apaga o GUI inteiro)
+    closeButton.MouseButton1Click:Connect(function()
+        screenGui:Destroy()
+        currentWindow = nil -- Reseta a variável global
     end)
 
     -- Função para criar seções na janela
@@ -159,7 +192,6 @@ function UILibrary:NewWindow(windowTitle)
         function section:CreateToggle(toggleText, callback)
             local toggle = Instance.new("TextButton")
             local toggleCorner = Instance.new("UICorner")
-            local isToggled = false
 
             toggle.Parent = contentFrame
             toggle.Text = toggleText
@@ -173,14 +205,10 @@ function UILibrary:NewWindow(windowTitle)
             toggleCorner.CornerRadius = UDim.new(0, 10)
             toggleCorner.Parent = toggle
 
+            local toggleState = false
             toggle.MouseButton1Click:Connect(function()
-                isToggled = not isToggled
-                callback(isToggled)
-                if isToggled then
-                    toggle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-                else
-                    toggle.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-                end
+                toggleState = not toggleState
+                callback(toggleState)
             end)
         end
 
