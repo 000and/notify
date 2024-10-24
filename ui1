@@ -1,1 +1,134 @@
 
+local UILibrary = {}
+
+-- Função para criar a janela principal
+function UILibrary:NewWindow(windowTitle)
+    local screenGui = Instance.new("ScreenGui")
+    local mainFrame = Instance.new("Frame")
+    local titleLabel = Instance.new("TextLabel")
+    local uiCorner = Instance.new("UICorner")
+    local uiListLayout = Instance.new("UIListLayout")
+
+    -- Configurações do ScreenGui
+    screenGui.Name = "CustomUI"
+    screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    screenGui.ResetOnSpawn = false
+
+    -- Frame da janela principal
+    mainFrame.Name = "MainFrame"
+    mainFrame.Parent = screenGui
+    mainFrame.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    mainFrame.Size = UDim2.new(0, 300, 0, 400)
+    mainFrame.Position = UDim2.new(0.5, -150, 0.5, -200)
+    mainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+    mainFrame.Active = true
+    mainFrame.Draggable = true
+
+    -- Layout para organizar as seções verticalmente
+    uiListLayout.Parent = mainFrame
+    uiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    uiListLayout.Padding = UDim.new(0, 10)
+
+    -- Label do título da janela
+    titleLabel.Name = "TitleLabel"
+    titleLabel.Parent = mainFrame
+    titleLabel.Text = windowTitle
+    titleLabel.Size = UDim2.new(1, 0, 0, 30)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+    titleLabel.Font = Enum.Font.SourceSansBold
+    titleLabel.TextSize = 20
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Center
+
+    -- Bordas arredondadas
+    uiCorner.CornerRadius = UDim.new(0, 10)
+    uiCorner.Parent = mainFrame
+
+    -- Função para criar seções na janela
+    local window = {}
+    function window:NewSection(sectionTitle)
+        local sectionFrame = Instance.new("Frame")
+        local sectionLabel = Instance.new("TextLabel")
+        local sectionListLayout = Instance.new("UIListLayout")
+
+        -- Frame da seção
+        sectionFrame.Parent = mainFrame
+        sectionFrame.Size = UDim2.new(1, 0, 0, 40)
+        sectionFrame.BackgroundTransparency = 1
+
+        -- Label do título da seção
+        sectionLabel.Parent = sectionFrame
+        sectionLabel.Text = sectionTitle
+        sectionLabel.Size = UDim2.new(1, 0, 0, 40)
+        sectionLabel.BackgroundTransparency = 1
+        sectionLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        sectionLabel.Font = Enum.Font.SourceSansBold
+        sectionLabel.TextSize = 18
+        sectionLabel.TextXAlignment = Enum.TextXAlignment.Left
+
+        -- Layout para organizar os itens dentro da seção
+        sectionListLayout.Parent = sectionFrame
+        sectionListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        sectionListLayout.Padding = UDim.new(0, 5)
+
+        -- Funções para criar elementos dentro da seção
+        local section = {}
+        
+        -- Função para criar botões
+        function section:CreateButton(buttonText, callback)
+            local button = Instance.new("TextButton")
+            local buttonCorner = Instance.new("UICorner")
+
+            button.Parent = sectionFrame
+            button.Text = buttonText
+            button.Size = UDim2.new(1, -10, 0, 40)
+            button.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+            button.TextColor3 = Color3.fromRGB(255, 255, 255)
+            button.Font = Enum.Font.SourceSans
+            button.TextSize = 18
+            button.TextScaled = true
+
+            buttonCorner.CornerRadius = UDim.new(0, 10)
+            buttonCorner.Parent = button
+
+            button.MouseButton1Click:Connect(function()
+                callback()
+            end)
+        end
+
+        -- Função para criar toggles (botões de alternância)
+        function section:CreateToggle(toggleText, callback)
+            local toggle = Instance.new("TextButton")
+            local toggleCorner = Instance.new("UICorner")
+            local isToggled = false
+
+            toggle.Parent = sectionFrame
+            toggle.Text = toggleText
+            toggle.Size = UDim2.new(1, -10, 0, 40)
+            toggle.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+            toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+            toggle.Font = Enum.Font.SourceSans
+            toggle.TextSize = 18
+            toggle.TextScaled = true
+
+            toggleCorner.CornerRadius = UDim.new(0, 10)
+            toggleCorner.Parent = toggle
+
+            toggle.MouseButton1Click:Connect(function()
+                isToggled = not isToggled
+                callback(isToggled)
+                if isToggled then
+                    toggle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+                else
+                    toggle.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+                end
+            end)
+        end
+
+        return section
+    end
+
+    return window
+end
+
+return UILibrary
